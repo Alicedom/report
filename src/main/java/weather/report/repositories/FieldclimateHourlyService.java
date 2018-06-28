@@ -20,7 +20,7 @@ public class FieldclimateHourlyService {
         Map<Timestamp, WeatherHourly> weatherHourlyMap = new HashMap<Timestamp, WeatherHourly>();
 
         fieldclimateHourlyRepository.getAllByStationCodeAndAndTime(stationCode, date).forEach(e->{
-            WeatherHourly weatherHourly = Utils.convertWind(e);
+            WeatherHourly weatherHourly = Utils.fixData(e);
             weatherHourlyMap.put(e.getTime(),e);
         });
 

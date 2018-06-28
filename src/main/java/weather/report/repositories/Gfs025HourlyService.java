@@ -19,7 +19,7 @@ public class Gfs025HourlyService  {
         Map<Timestamp, WeatherHourly> weatherHourlyMap = new HashMap<Timestamp, WeatherHourly>();
 
         gfs025HourlyRepository.getAllByStationCodeAndAndTime(stationCode, date).forEach(e->{
-            WeatherHourly weatherHourly = Utils.convertWind(e);
+            WeatherHourly weatherHourly = Utils.fixData(e);
             weatherHourlyMap.put(e.getTime(),e);
         });
 

@@ -56,14 +56,21 @@ public class Utils {
     }
 
 
-    public static WeatherHourly convertWind(WeatherHourly e) {
+    public static WeatherHourly fixData(WeatherHourly e) {
         String windDirection = e.getWindDirection();
-        if (windDirection.length() == 1)
+        if(windDirection.length() == 0){
+            windDirection = "___";
+        }
+        else if (windDirection.length() == 1)
             windDirection = "_" + windDirection;
         else if (windDirection.length() == 2)
             windDirection = "__" + windDirection;
         e.setWindDirection(windDirection);
 
+        // fix null data
+        if(e.getUvIndex() == null){
+            e.setUvIndex((byte) 0);
+        }
         return e;
     }
 

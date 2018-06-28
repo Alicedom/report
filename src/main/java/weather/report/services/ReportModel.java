@@ -19,13 +19,14 @@ import weather.report.entities.WeatherHourly;
 import java.io.*;
 import java.util.Calendar;
 import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
 public class ReportModel {
     private final static Logger logger = LoggerFactory.getLogger(ReportModel.class);
 
-    private final String TEMP_FILENAME = "templates/template.xlsx";
+    private final String TEMP_FILENAME = "/home/java/data/report/templates/template.xlsx";
     private final String OUT_FILENAME = "/home/java/data/report/Bản tin thời tiết tự động ";
 
     private final int START_ROW = 3;
@@ -38,14 +39,16 @@ public class ReportModel {
     @Autowired
     CalculateHourlyService calculateHourlyService;
 
-    public void getReport(Integer forecatDates) {
+    public List<String> getReport(Integer forecatDates) {
+        List<String> linkedListTotalSMS = new LinkedList<>();
         FileInputStream templateFile = null;
         XSSFWorkbook workbook = null;
 
         try {
-            File file = new ClassPathResource(TEMP_FILENAME).getFile();
+            File file = new File(TEMP_FILENAME);
+            logger.error(":"+file.getPath());
+            logger.error("::"+file.getAbsolutePath());
             templateFile = new FileInputStream(file);
-            logger.error(file.getAbsolutePath());
             workbook = new XSSFWorkbook(templateFile);
         } catch (FileNotFoundException e) {
             logger.error(e.getMessage());
@@ -137,7 +140,8 @@ public class ReportModel {
                 cell = sheet.getRow(row).getCell(22);
                 cell.setCellValue(Utils.getNonSign(sms));
                 //log
-                logger.info(sms);
+//                logger.info(sms);
+                linkedListTotalSMS.add(sms);
             }
         }
 
@@ -164,6 +168,8 @@ public class ReportModel {
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
+
+        return linkedListTotalSMS;
     }
 
     private String getSMSReport(String date, SessionFormular formular) {

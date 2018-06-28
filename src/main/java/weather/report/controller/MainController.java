@@ -43,14 +43,14 @@ public class MainController {
     @GetMapping("weatherHourly")
     public ResponseEntity<Map<Timestamp, WeatherHourly>> getList(String site,String stationCode, int day){
         Map<Timestamp, WeatherHourly> map = services.getMapTimeHourlies(Utils.getSite(site), stationCode,day);
-        log.info("size = "+map.size());
+//        log.info("size = "+map.size());
         return new ResponseEntity<>(Utils.sorted(map),HttpStatus.OK);
     }
 
     @GetMapping("getHourly")
     public ResponseEntity<WeatherHourly> getList(String site, int id){
         WeatherHourly weatherHourly = services.getHourly(Utils.getSite(site),id);
-        log.info("size = "+weatherHourly.toString());
+//        log.info("size = "+weatherHourly.toString());
         return new ResponseEntity<>(weatherHourly,HttpStatus.OK);
     }
 
@@ -61,7 +61,7 @@ public class MainController {
     public ResponseEntity<Map<Timestamp, Integer>> getKey(String stationCode, int date){
         avgHourlyService.set(stationCode,date);
         Map<Timestamp, Integer> timestampSet = avgHourlyService.getKeys();
-        log.info("size = "+timestampSet.size());
+//        log.info("size = "+timestampSet.size());
         return new ResponseEntity<>(Utils.sorted(timestampSet),HttpStatus.OK);
     }
 
@@ -69,7 +69,7 @@ public class MainController {
     public ResponseEntity<Integer> countKey(String stationCode, int date, Timestamp key){
         avgHourlyService.set(stationCode,date);
         int countKey = avgHourlyService.countKey(key);
-        log.info("size = "+countKey);
+//        log.info("size = "+countKey);
         return new ResponseEntity<>(countKey,HttpStatus.OK);
     }
 
@@ -77,7 +77,7 @@ public class MainController {
     public ResponseEntity<Map<Timestamp, WeatherHourly>> getSum(String stationCode, int date){
         avgHourlyService.set(stationCode,date);
         Map<Timestamp, WeatherHourly> weatherHourlyMap = avgHourlyService.calculateSum();
-        log.info("size = "+weatherHourlyMap.size());
+//        log.info("size = "+weatherHourlyMap.size());
         return new ResponseEntity<>(Utils.sorted(weatherHourlyMap),HttpStatus.OK);
     }
 
@@ -85,7 +85,7 @@ public class MainController {
     public ResponseEntity<Map<Timestamp, WeatherHourly>> getAvg(String stationCode, int date){
         avgHourlyService.set(stationCode,date);
         Map<Timestamp, WeatherHourly> weatherHourlyMap = avgHourlyService.calculateAvg();
-        log.info("size = "+weatherHourlyMap.size());
+//        log.info("size = "+weatherHourlyMap.size());
         return new ResponseEntity<>(Utils.sorted(weatherHourlyMap),HttpStatus.OK);
     }
 
@@ -103,8 +103,8 @@ public class MainController {
         Map<String, Integer> weatherHourlyMap = avgHourlyService.countWindirection();
 
         Map.Entry<String, Integer> maxEntry= Utils.getMaxWind(weatherHourlyMap);
-        log.info("max = "+ maxEntry.getKey()+" : "+maxEntry.getValue());
-        log.info("windmax = "+weatherHourlyMap.toString());
+//        log.info("max = "+ maxEntry.getKey()+" : "+maxEntry.getValue());
+//        log.info("windmax = "+weatherHourlyMap.toString());
         return new ResponseEntity<>(maxEntry,HttpStatus.OK);
     }
 
@@ -112,9 +112,9 @@ public class MainController {
     private ReportModel reportModel;
 
     @GetMapping("getReport")
-    public ResponseEntity<String> getReport(Integer forecatDates){
-        reportModel.getReport(forecatDates);
-        return new ResponseEntity<>("Done",HttpStatus.OK);
+    public ResponseEntity<List<String>> getReport(Integer forecatDates){
+        List<String> list = reportModel.getReport(forecatDates);
+        return new ResponseEntity<>(list,HttpStatus.OK);
     }
 
 }

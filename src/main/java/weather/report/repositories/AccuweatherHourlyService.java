@@ -19,7 +19,7 @@ public class AccuweatherHourlyService   {
         Map<Timestamp, WeatherHourly> weatherHourlyMap = new HashMap<Timestamp, WeatherHourly>();
 
         accuweatherHourlyRepository.getAllByStationCodeAndAndTime(stationCode, date).forEach(e->{
-            WeatherHourly weatherHourly = Utils.convertWind(e);
+            WeatherHourly weatherHourly = Utils.fixData(e);
 
             weatherHourlyMap.put(e.getTime(),e);
         });
