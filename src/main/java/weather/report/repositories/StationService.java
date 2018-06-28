@@ -15,5 +15,5 @@ public class StationService {
 
     public List<Station> getEnableStations(){
         return stationRepository.getEnableStations();
-    };
+    }
 }

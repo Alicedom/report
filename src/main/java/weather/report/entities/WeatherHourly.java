@@ -1,5 +1,8 @@
 package weather.report.entities;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import weather.report.services.JsonTimestampSerializer;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 
@@ -90,7 +93,6 @@ public class WeatherHourly {
     public Double getWindSpeed() {
         return windSpeed;
     }
-
 
     public void setWindSpeed(Double windSpeed) {
         this.windSpeed = windSpeed;

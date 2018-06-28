@@ -1,5 +1,6 @@
 package weather.report.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +17,11 @@ import weather.report.sms.Utils;
 import weather.report.entities.WeatherHourly;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 
 @Controller
 @RequestMapping("report")
@@ -41,7 +44,7 @@ public class MainController {
     public ResponseEntity<Map<Timestamp, WeatherHourly>> getList(String site,String stationCode, int day){
         Map<Timestamp, WeatherHourly> map = services.getMapTimeHourlies(Utils.getSite(site), stationCode,day);
         log.info("size = "+map.size());
-        return new ResponseEntity<>(map,HttpStatus.OK);
+        return new ResponseEntity<>(Utils.sorted(map),HttpStatus.OK);
     }
 
     @GetMapping("getHourly")
@@ -59,7 +62,7 @@ public class MainController {
         avgHourlyService.set(stationCode,date);
         Map<Timestamp, Integer> timestampSet = avgHourlyService.getKeys();
         log.info("size = "+timestampSet.size());
-        return new ResponseEntity<>(timestampSet,HttpStatus.OK);
+        return new ResponseEntity<>(Utils.sorted(timestampSet),HttpStatus.OK);
     }
 
     @GetMapping("countKey")
@@ -75,7 +78,7 @@ public class MainController {
         avgHourlyService.set(stationCode,date);
         Map<Timestamp, WeatherHourly> weatherHourlyMap = avgHourlyService.calculateSum();
         log.info("size = "+weatherHourlyMap.size());
-        return new ResponseEntity<>(weatherHourlyMap,HttpStatus.OK);
+        return new ResponseEntity<>(Utils.sorted(weatherHourlyMap),HttpStatus.OK);
     }
 
     @GetMapping("getAvg")
@@ -83,7 +86,7 @@ public class MainController {
         avgHourlyService.set(stationCode,date);
         Map<Timestamp, WeatherHourly> weatherHourlyMap = avgHourlyService.calculateAvg();
         log.info("size = "+weatherHourlyMap.size());
-        return new ResponseEntity<>(weatherHourlyMap,HttpStatus.OK);
+        return new ResponseEntity<>(Utils.sorted(weatherHourlyMap),HttpStatus.OK);
     }
 
     @GetMapping("countWindirection")
@@ -91,7 +94,7 @@ public class MainController {
         avgHourlyService.set(stationCode,date);
         Map<String, Integer> weatherHourlyMap = avgHourlyService.countWindirection();
 
-        return new ResponseEntity<>(weatherHourlyMap,HttpStatus.OK);
+        return new ResponseEntity<>(Utils.sorted(weatherHourlyMap),HttpStatus.OK);
     }
 
     @GetMapping("getMaxWind")

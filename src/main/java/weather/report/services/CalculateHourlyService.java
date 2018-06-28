@@ -86,6 +86,10 @@ public class CalculateHourlyService {
             map2 = darkskyHourlyService.getMapTimeHourlies(stationCode, date);
             map3 = fieldclimateHourlyService.getMapTimeHourlies(stationCode, date);
             map4 = gfs025HourlyService.getMapTimeHourlies(stationCode, date);
+
+            if(mapSum!= null){
+                calculateSum();
+            }
         }
 
     }

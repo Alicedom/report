@@ -134,7 +134,7 @@ public class SessionFormular {
         while (iter.hasMoreElements()) {
             String key = iter.nextElement();
 
-            Double rainmount = (Double) (Math.round(rain.get(key) * 10.0) / 10.0);
+            Double rainmount = Math.round(rain.get(key) * 10.0) / 10.0;
             if (rainmount == 0 || percentRain.get(key) < 20) {
                 rain.remove(key);
                 percentRain.remove(key);
@@ -235,7 +235,7 @@ public class SessionFormular {
     }
 
     public Double getAverageWindSpeed() {
-        return (Double) (Math.round(averageWindSpeed * 10.0) / 10.0);
+        return Math.round(averageWindSpeed * 10.0) / 10.0;
     }
 
     public String getReport_AverageWindSpeed() {

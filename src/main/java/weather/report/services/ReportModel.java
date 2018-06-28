@@ -121,7 +121,7 @@ public class ReportModel {
                         List<String> session = SMSRule.getListSMS(SMSRule.getSession());
                         for (int j = 0; j < session.size(); j++) {
                             if (rain.containsKey(session.get(j))) {
-                                Double mount = (Double) (Math.round(rain.get(session.get(j)) * 10.0) / 10.0);
+                                Double mount = Math.round(rain.get(session.get(j)) * 10.0) / 10.0;
                                 cell = sheet.getRow(row).getCell(2 + j);
                                 cell.setCellValue(mount);
                                 cell = sheet.getRow(row).getCell(3 + j);

@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 public class Utils {
@@ -106,6 +107,12 @@ public class Utils {
         String nfdNormalizedString = Normalizer.normalize(s, Normalizer.Form.NFD);
         Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
         return pattern.matcher(nfdNormalizedString).replaceAll("");
+    }
+
+    public static<K,V> Map<K,V> sorted(Map<K,V> map){
+        Map<K,V> sorted = new TreeMap<>();
+        map.forEach((k,v)-> sorted.put(k,v));
+        return sorted;
     }
 
 }
