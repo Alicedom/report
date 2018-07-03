@@ -2,19 +2,20 @@
 <persistence xmlns="http://java.sun.com/xml/ns/persistence" version="2.0">
 
     <persistence-unit name="NewPersistenceUnit">
-        <class>weather.report.entities.Station</class>
+        <class>weather.report.entities.FieldclimateHourly</class>
+        <class>weather.report.entities.FieldclimateForecastLast</class>
+        <class>weather.report.entities.Gfs025Hourly</class>
         <class>weather.report.entities.AccuweatherHourly</class>
         <class>weather.report.entities.DarkskyHourly</class>
-        <class>weather.report.entities.FieldclimateHourly</class>
-        <class>weather.report.entities.Gfs025Hourly</class>
+        <class>weather.report.entities.Station</class>
         <properties>
-            <property name="toplink.jdbc.url" value="jdbc:mysql://localhost:3306/fieldclimate"/>
+            <property name="toplink.jdbc.url" value="jdbc:mysql://172.16.0.252:3306/fieldclimate"/>
             <property name="toplink.jdbc.driver" value="com.mysql.jdbc.Driver"/>
-            <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/fieldclimate"/>
+            <property name="hibernate.connection.url" value="jdbc:mysql://172.16.0.252:3306/fieldclimate"/>
             <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
-            <property name="openjpa.ConnectionURL" value="jdbc:mysql://localhost:3306/fieldclimate"/>
+            <property name="openjpa.ConnectionURL" value="jdbc:mysql://172.16.0.252:3306/fieldclimate"/>
             <property name="openjpa.ConnectionDriverName" value="com.mysql.jdbc.Driver"/>
-            <property name="eclipselink.jdbc.url" value="jdbc:mysql://localhost:3306/fieldclimate"/>
+            <property name="eclipselink.jdbc.url" value="jdbc:mysql://172.16.0.252:3306/fieldclimate"/>
             <property name="eclipselink.jdbc.driver" value="com.mysql.jdbc.Driver"/>
         </properties>
     </persistence-unit>

@@ -5,10 +5,8 @@ import weather.report.entities.WeatherHourly;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Date;
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.Normalizer;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,18 +15,22 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 public class Utils {
+    public static final String TO = "total_hourly";
     public static final String AC = "accuweather_hourly";
     public static final String FI = "fieldclimate_hourly";
+    public static final String LA = "fieldclimatelast";
     public static final String DA = "darksky_hourly";
     public static final String GF = "gfs025_hourly";
     public static final String WE = "weather_hourly";
 
+    public static final String DATA_RAW = "raw";
+    public static final String SMS = "sms";
 
-    public static String getSite(String site){
+    public static String getSite(String site) {
         String table = null;
-        String[] array = new String[]{AC,FI, DA, GF, WE};
-        for (int i = 0; i < array.length;i++){
-            if(array[i].contains(site)){
+        String[] array = new String[]{LA, GF, DA, GF, FI, AC, TO};
+        for (int i = 0; i < array.length; i++) {
+            if (array[i].contains(site)) {
                 table = array[i];
                 break;
             }
@@ -41,7 +43,6 @@ public class Utils {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
         return df.format(new Date(System.currentTimeMillis()));
     }
-
 
 
     public static void checkAndCreateNewFile(String saveDir) throws IOException {
@@ -58,19 +59,22 @@ public class Utils {
 
     public static WeatherHourly fixData(WeatherHourly e) {
         String windDirection = e.getWindDirection();
-        if(windDirection.length() == 0){
-            windDirection = "___";
-        }
-        else if (windDirection.length() == 1)
-            windDirection = "_" + windDirection;
-        else if (windDirection.length() == 2)
+        if (windDirection.length() == 0) {
+            windDirection = "__0";
+        } else if (windDirection.length() == 1)
             windDirection = "__" + windDirection;
+        else if (windDirection.length() == 2)
+            windDirection = "_" + windDirection;
         e.setWindDirection(windDirection);
 
         // fix null data
-        if(e.getUvIndex() == null){
-            e.setUvIndex((byte) 0);
-        }
+        if (e.getUvIndex() == null) {e.setUvIndex((byte) 0);}
+        if (e.getWindSpeed() == null) {e.setWindSpeed(0.0);}
+        if (e.getProbability() == null) {e.setProbability(0.0);}
+        if (e.getWindEdge() == null) {e.setWindEdge(0.0);}
+        if (e.getTotalLiquid() == null) {e.setTotalLiquid(0.0);}
+        if (e.getHumidity() == null) {e.setHumidity(0.0);}
+
         return e;
     }
 
@@ -104,7 +108,7 @@ public class Utils {
     public static <K, V> List convert(Map<K, V> map) {
         List<V> list = new LinkedList<V>();
 
-        map.forEach((k,v) -> list.add(v));
+        map.forEach((k, v) -> list.add(v));
 
         return list;
     }
@@ -116,10 +120,25 @@ public class Utils {
         return pattern.matcher(nfdNormalizedString).replaceAll("");
     }
 
-    public static<K,V> Map<K,V> sorted(Map<K,V> map){
-        Map<K,V> sorted = new TreeMap<>();
-        map.forEach((k,v)-> sorted.put(k,v));
+    public static <K, V> Map<K, V> sorted(Map<K, V> map) {
+        Map<K, V> sorted = new TreeMap<>();
+        map.forEach((k, v) -> sorted.put(k, v));
         return sorted;
+    }
+
+    public static String convertELWind(String wind){
+        List<String> sms = SMSRule.getListSMS(SMSRule.getGetWindDirectSMSRule());
+        List<String> el = SMSRule.getListSMS(SMSRule.getGetWindDirectELRule());
+        String smsName = null;
+        for (int i = 0; i < el.size(); i++) {
+            if(el.get(i).equals(wind)){
+
+                smsName = sms.get(i);
+                break;
+            }
+        }
+
+        return smsName;
     }
 
 }

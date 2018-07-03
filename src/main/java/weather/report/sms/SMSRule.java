@@ -142,7 +142,7 @@ public class SMSRule {
                 rightBound = Double.valueOf(rule[1].toString());
             else rightBound = Double.MAX_VALUE;
 
-            if (leftBound <= data && data < rightBound)
+            if (leftBound < data && data <= rightBound)
                 sms = rule[2].toString();
         }
 

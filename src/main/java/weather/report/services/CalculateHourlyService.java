@@ -5,13 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import weather.report.repositories.AccuweatherHourlyService;
 import weather.report.repositories.DarkskyHourlyService;
-import weather.report.repositories.FieldclimateHourlyService;
+import weather.report.repositories.FieldclimateForecastLastService;
 import weather.report.repositories.Gfs025HourlyService;
 import weather.report.sms.SMSRule;
 import weather.report.sms.Utils;
 import weather.report.entities.WeatherHourly;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.BiFunction;
@@ -60,7 +59,9 @@ public class CalculateHourlyService {
     @Autowired
     DarkskyHourlyService darkskyHourlyService;
     @Autowired
-    FieldclimateHourlyService fieldclimateHourlyService;
+    FieldclimateForecastLastService fieldclimateHourlyService;
+    @Autowired
+    FieldclimateForecastLastService fieldclimateForecastLastService;
     @Autowired
     Gfs025HourlyService gfs025HourlyService;
     private Map<Timestamp, WeatherHourly> map1;
@@ -75,22 +76,22 @@ public class CalculateHourlyService {
 
     public void set(String stationCode, int date) {
 
-        if (this.stationCode == stationCode && this.date == date) {
-            //old data
-
-        } else {
+//        if (this.stationCode == stationCode && this.date == date) {
+//            //old data
+//
+//        } else {
             this.stationCode = stationCode;
             this.date = date;
 
             map1 = accuweatherHourlyService.getMapTimeHourlies(stationCode, date);
             map2 = darkskyHourlyService.getMapTimeHourlies(stationCode, date);
-            map3 = fieldclimateHourlyService.getMapTimeHourlies(stationCode, date);
+            map3 = fieldclimateForecastLastService.getMapTimeHourlies(stationCode, date);
             map4 = gfs025HourlyService.getMapTimeHourlies(stationCode, date);
 
             if(mapSum!= null){
                 calculateSum();
             }
-        }
+//        }
 
     }
 

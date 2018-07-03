@@ -2,17 +2,15 @@ package weather.report.sms;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import weather.report.entities.WeatherHourly;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /*
     calculate sum, max, min, average data from List of Weather forecast Data
  */
-
+@Service
 public class SessionFormular {
 
     private final static Logger logger = LoggerFactory.getLogger(SessionFormular.class);
@@ -26,9 +24,7 @@ public class SessionFormular {
     private Hashtable<String, Double> rain;
     private Hashtable<String, Double> percentRain;
 
-    public SessionFormular(List<WeatherHourly> list) {
-        this.list = list;
-
+    public SessionFormular() {
         maxTemperature = Double.MIN_VALUE;
         minTemperature = Double.MAX_VALUE;
         averageHumidity = 0;
@@ -37,6 +33,10 @@ public class SessionFormular {
         totalUV = 0;
         rain = new Hashtable<String, Double>();
         percentRain = new Hashtable<String, Double>();
+    }
+
+    public void calculate(List<WeatherHourly> list) {
+        this.list = list;
 
         if (list.size() > 0) {
             if (list.size() != 24) {
@@ -51,10 +51,9 @@ public class SessionFormular {
         } else {
             logger.info("Không có dữ liệu để tính toán");
         }
-
     }
 
-    private void calculateMaxWindDirect() {
+    public String calculateMaxWindDirect() {
         Hashtable<String, Integer> listWindDirect = new Hashtable<String, Integer>();
 
         for (WeatherHourly data : list) {
@@ -74,9 +73,12 @@ public class SessionFormular {
                 maxWindDirect = entry.getKey();
             }
         }
+
+        maxWindDirect = Utils.convertELWind(maxWindDirect);
+        return maxWindDirect+ " : " +numberDirectMax;
     }
 
-    private void calculateAverageWindSpeed() {
+    public Double calculateAverageWindSpeed() {
 
         double totalWindSpeed = 0;
 
@@ -87,9 +89,11 @@ public class SessionFormular {
             this.averageWindSpeed = totalWindSpeed / list.size();
         }
 
+        return averageWindSpeed;
+
     }
 
-    private void calculateAverageHumidity() {
+    public Double calculateAverageHumidity() {
 
         int totalHumidity = 0;
 
@@ -100,18 +104,21 @@ public class SessionFormular {
             this.averageHumidity = totalHumidity / list.size();
         }
 
+        return averageHumidity;
     }
 
-    private void calculateMinMaxTemperatue() {
+    public String calculateMinMaxTemperatue() {
 
         for (WeatherHourly data : list) {
             Double temperature = data.getTemperature();
             if (temperature > maxTemperature) maxTemperature = temperature;
             if (temperature < minTemperature) minTemperature = temperature;
         }
+
+        return maxTemperature + " : "+ minTemperature;
     }
 
-    private void calculateRainAndPercentRain() {
+    public List calculateRainAndPercentRain() {
 
         for (WeatherHourly data : list) {
             String session = getSession(data);
@@ -140,14 +147,15 @@ public class SessionFormular {
                 percentRain.remove(key);
             }
         }
+        return Arrays.asList(rain, percentRain);
 
     }
 
-    private void calculateNumberSum() {
+    public Hashtable<String, Integer> calculateNumberSum() {
         Hashtable<String, Integer> listSun = new Hashtable<String, Integer>();
 
         for (WeatherHourly data : list) {
-            String typeOfSun = getTypeOfSun((double)data.getUvIndex());
+            String typeOfSun = getTypeOfSun((double) data.getUvIndex());
 
             if (listSun.containsKey(typeOfSun)) {
                 listSun.replace(typeOfSun, listSun.get(typeOfSun) + 1);
@@ -155,9 +163,10 @@ public class SessionFormular {
                 listSun.put(typeOfSun, 1);
         }
 
+        return listSun;
     }
 
-    private void calculateAvgUVAndNumberMaxSun() {
+    public int calculateAvgUVAndNumberMaxSun() {
 
         int uvRuleSize = SMSRule.getUvSMSRule().length;
         String maxSun = (String) SMSRule.getUvSMSRule()[uvRuleSize - 1][2];
@@ -165,17 +174,19 @@ public class SessionFormular {
         for (WeatherHourly data : list) {
             totalUV += data.getUvIndex();
 
-            if (maxSun.equals(getTypeOfSun((double)data.getUvIndex()))) {
+            if (maxSun.equals(getTypeOfSun((double) data.getUvIndex()))) {
                 numberMaxSun++;
             }
         }
+
+        return numberMaxSun;
     }
 
-    private String getSession(WeatherHourly data) {
-        return SMSRule.getSession(data.getTime().getHours()+1);
+    public String getSession(WeatherHourly data) {
+        return SMSRule.getSession(data.getTime().getHours() + 1);
     }
 
-    private String getTypeOfSun(Double uvData) {
+    public String getTypeOfSun(Double uvData) {
         return SMSRule.smsGenerateElement(uvData, SMSRule.getUvSMSRule());
     }
 
@@ -185,6 +196,10 @@ public class SessionFormular {
             return "";
         else
             return String.valueOf(String.valueOf(Math.round(maxTemperature)));
+    }
+
+    public void setMaxTemperature(double maxTemperature) {
+        this.maxTemperature = maxTemperature;
     }
 
     public String getReport_MaxTemperature() {
@@ -206,6 +221,10 @@ public class SessionFormular {
             return String.valueOf(Math.round(minTemperature));
     }
 
+    public void setMinTemperature(double minTemperature) {
+        this.minTemperature = minTemperature;
+    }
+
     public String getReport_MinTemperature() {
         String report = null;
 
@@ -220,6 +239,10 @@ public class SessionFormular {
 
     public double getAverageHumidity() {
         return Math.round(averageHumidity);
+    }
+
+    public void setAverageHumidity(double averageHumidity) {
+        this.averageHumidity = averageHumidity;
     }
 
     public String getReport_AverageHumidity() {
@@ -238,6 +261,10 @@ public class SessionFormular {
         return Math.round(averageWindSpeed * 10.0) / 10.0;
     }
 
+    public void setAverageWindSpeed(double averageWindSpeed) {
+        this.averageWindSpeed = averageWindSpeed;
+    }
+
     public String getReport_AverageWindSpeed() {
         String report = null;
 
@@ -252,6 +279,10 @@ public class SessionFormular {
 
     public String getMaxWindDirect() {
         return maxWindDirect;
+    }
+
+    public void setMaxWindDirect(String maxWindDirect) {
+        this.maxWindDirect = maxWindDirect;
     }
 
     public String getReport_MaxWindDirect() {
@@ -272,8 +303,16 @@ public class SessionFormular {
         return rain;
     }
 
+    public void setRain(Hashtable<String, Double> rain) {
+        this.rain = rain;
+    }
+
     public Hashtable<String, Double> getPercentRain() {
         return percentRain;
+    }
+
+    public void setPercentRain(Hashtable<String, Double> percentRain) {
+        this.percentRain = percentRain;
     }
 
     public String getReport_RainAndPercentRain() {
@@ -298,6 +337,10 @@ public class SessionFormular {
         return numberMaxSun;
     }
 
+    public void setNumberMaxSun(int numberMaxSun) {
+        this.numberMaxSun = numberMaxSun;
+    }
+
     public String getReport_NumberMaxSun() {
         String report = null;
 
@@ -313,6 +356,10 @@ public class SessionFormular {
 
     public double getTotalUV() {
         return totalUV;
+    }
+
+    public void setTotalUV(int totalUV) {
+        this.totalUV = totalUV;
     }
 
     public String getReport_TotalUV() {
@@ -332,39 +379,20 @@ public class SessionFormular {
         this.list = list;
     }
 
-    public void setMaxTemperature(double maxTemperature) {
-        this.maxTemperature = maxTemperature;
-    }
+    public List<String> getSMSReport() {
 
-    public void setMinTemperature(double minTemperature) {
-        this.minTemperature = minTemperature;
-    }
+        List<String> list = new LinkedList<>();
 
-    public void setAverageHumidity(double averageHumidity) {
-        this.averageHumidity = averageHumidity;
-    }
+        list.add("Dự báo ngày: ");
+        list.add(getReport_MaxTemperature());
+        list.add(getReport_MinTemperature());
+        list.add(getReport_AverageHumidity());
+        list.add(getReport_MaxWindDirect());
+        list.add(getReport_AverageWindSpeed());
+        list.add(getReport_NumberMaxSun());
+        list.add(getReport_RainAndPercentRain());
 
-    public void setMaxWindDirect(String maxWindDirect) {
-        this.maxWindDirect = maxWindDirect;
-    }
+        return list;
 
-    public void setAverageWindSpeed(double averageWindSpeed) {
-        this.averageWindSpeed = averageWindSpeed;
-    }
-
-    public void setNumberMaxSun(int numberMaxSun) {
-        this.numberMaxSun = numberMaxSun;
-    }
-
-    public void setTotalUV(int totalUV) {
-        this.totalUV = totalUV;
-    }
-
-    public void setRain(Hashtable<String, Double> rain) {
-        this.rain = rain;
-    }
-
-    public void setPercentRain(Hashtable<String, Double> percentRain) {
-        this.percentRain = percentRain;
     }
 }

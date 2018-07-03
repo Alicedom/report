@@ -7,27 +7,24 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import weather.report.entities.Station;
+import weather.report.entities.WeatherHourly;
 import weather.report.repositories.StationService;
 import weather.report.sms.SMSRule;
 import weather.report.sms.SessionFormular;
 import weather.report.sms.Utils;
-import weather.report.entities.WeatherHourly;
 
 import java.io.*;
-import java.util.Calendar;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.List;
+import java.sql.Timestamp;
+import java.util.*;
 
 @Service
 public class ReportModel {
     private final static Logger logger = LoggerFactory.getLogger(ReportModel.class);
 
     private final String TEMP_FILENAME = "/home/java/data/report/templates/template.xlsx";
-    private final String OUT_FILENAME = "/home/java/data/report/Bản tin thời tiết tự động ";
+    private final String OUT_FILENAME = "/home/java/data/report/Ban tin thoi tiet tu dong ";
 
     private final int START_ROW = 3;
     private final int DEFAULT_NUMBER_FORECAST = 5;
@@ -37,17 +34,24 @@ public class ReportModel {
     StationService stationService;
 
     @Autowired
-    CalculateHourlyService calculateHourlyService;
+    Services services;
 
-    public List<String> getReport(Integer forecatDates) {
-        List<String> linkedListTotalSMS = new LinkedList<>();
+    @Autowired
+    SessionFormular formular;
+
+    private List<String> linkedListTotalSMS;
+
+    public String getReport(Integer forecatDates, String site) {
+        String fileout = OUT_FILENAME + Utils.getCurTime()+site+".xlsx";
+
+        linkedListTotalSMS = new LinkedList<>();
         FileInputStream templateFile = null;
         XSSFWorkbook workbook = null;
 
         try {
             File file = new File(TEMP_FILENAME);
-            logger.error(":"+file.getPath());
-            logger.error("::"+file.getAbsolutePath());
+            logger.info("file path:"+file.getPath());
+            logger.info("file absolute path::"+file.getAbsolutePath());
             templateFile = new FileInputStream(file);
             workbook = new XSSFWorkbook(templateFile);
         } catch (FileNotFoundException e) {
@@ -68,8 +72,12 @@ public class ReportModel {
             }
             for (int forecastDay = 0; forecastDay < forecatDates; forecastDay++) {
                 int row = START_ROW + forecastDay;
-                calculateHourlyService.set(station.getStationCode(), forecastDay);
-                List<WeatherHourly> listStationHourlyData = Utils.convert(calculateHourlyService.calculateAvg());
+
+                logger.info(site);
+                logger.info(station.getStationCode());
+                logger.info(forecastDay+" : "+site);
+                Map<Timestamp, WeatherHourly> map = services.getMapTimeHourlies(site, station.getStationCode(), forecastDay);
+                List<WeatherHourly> listStationHourlyData = Utils.convert(map);
 
                 Cell cell = null;
                 //Update the value of cell
@@ -84,8 +92,8 @@ public class ReportModel {
                 if (listStationHourlyData == null || listStationHourlyData.isEmpty()) {
                     sms = "Trạm " + station.getStationNameVi() + " không có dữ liệu dự báo\n";
                 } else {
-                    SessionFormular formular = new SessionFormular(listStationHourlyData);
-                    formular.setMaxWindDirect((String) Utils.getMaxWind(calculateHourlyService.countWindirection()).getKey());
+
+                    formular.calculate(listStationHourlyData);
 
                     sms = "Trạm " + station.getStationNameVi() + getSMSReport(date, formular);
 
@@ -145,12 +153,13 @@ public class ReportModel {
             }
         }
 
+
+
         FileOutputStream outFile = null;
         try {
 
-            String fileout = OUT_FILENAME + Utils.getCurTime()+".xlsx";
             Utils.checkAndCreateNewFile(fileout);
-            outFile = new FileOutputStream(new File(fileout), true);
+            outFile = new FileOutputStream(fileout);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
@@ -169,7 +178,8 @@ public class ReportModel {
             logger.error(e.getMessage());
         }
 
-        return linkedListTotalSMS;
+        return fileout;
+//        return linkedListTotalSMS;
     }
 
     private String getSMSReport(String date, SessionFormular formular) {
@@ -190,5 +200,7 @@ public class ReportModel {
 
     }
 
-
+    public List<String> getLinkedListTotalSMS() {
+        return linkedListTotalSMS;
+    }
 }
