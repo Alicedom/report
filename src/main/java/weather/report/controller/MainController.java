@@ -120,7 +120,7 @@ public class MainController {
 
     @RequestMapping(value = "download", method = RequestMethod.GET, params = {"forecat"})
     public void download1(HttpServletResponse response, @RequestParam String forecat) {
-        download1(response, forecat, Utils.TO);
+        download1(response, forecat, Utils.WE);
     }
 
     @RequestMapping(value = "download", method = RequestMethod.GET, params = {"site"})
@@ -130,6 +130,6 @@ public class MainController {
 
     @RequestMapping(value = "download", method = RequestMethod.GET, params = {})
     public void download2(HttpServletResponse response) {
-        download1(response, "5", Utils.TO);
+        download1(response, "5", Utils.WE);
     }
 }

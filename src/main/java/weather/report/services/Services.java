@@ -4,14 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import weather.report.controller.MainController;
 import weather.report.repositories.*;
 import weather.report.sms.Utils;
 import weather.report.entities.WeatherHourly;
 
-import java.sql.Time;
 import java.sql.Timestamp;
-import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -31,14 +28,15 @@ public class Services {
     @Autowired
     FieldclimateForecastLastService la;
     @Autowired
-    CalculateHourlyService to;
+    CalculateHourlyService we;
+
     public Map<Timestamp, WeatherHourly> getMapTimeHourlies(String site, String stationCode, int date) {
         Map<Timestamp, WeatherHourly> map = new HashMap();
 
         if (site == null || site.equals("") ||
-                Utils.getSite(site).equals(Utils.TO)){
-            to.set(stationCode, date);
-            map = to.calculateAvg();
+                Utils.getSite(site).equals(Utils.WE)){
+            we.set(stationCode, date);
+            map = we.calculateAvg();
         }else if (Utils.getSite(site).equals(Utils.LA)) {
             map = la.getMapTimeHourlies(stationCode, date);
         } else if (Utils.getSite(site).equals(Utils.GF)) {
@@ -57,9 +55,9 @@ public class Services {
     public List<WeatherHourly> getTimeHourlies(String site, String stationCode, int date) {
         List<WeatherHourly> map = new LinkedList<>();
 
-        if (site == null || Utils.getSite(site).equals(Utils.TO)) {
-            to.set(stationCode, date);
-            map = Utils.convert(to.calculateAvg());
+        if (site == null || Utils.getSite(site).equals(Utils.WE)) {
+            we.set(stationCode, date);
+            map = Utils.convert(we.calculateAvg());
         } else if (Utils.getSite(site).equals(Utils.LA)) {
             map = la.getHourlies(stationCode, date);
         } else if (Utils.getSite(site).equals(Utils.GF)) {

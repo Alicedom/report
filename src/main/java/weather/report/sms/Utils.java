@@ -15,7 +15,6 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 public class Utils {
-    public static final String TO = "total_hourly";
     public static final String AC = "accuweather_hourly";
     public static final String FI = "fieldclimate_hourly";
     public static final String LA = "fieldclimatelast";
@@ -28,7 +27,7 @@ public class Utils {
 
     public static String getSite(String site) {
         String table = null;
-        String[] array = new String[]{LA, GF, DA, GF, FI, AC, TO};
+        String[] array = new String[]{LA, GF, DA, GF, FI, AC, WE};
         for (int i = 0; i < array.length; i++) {
             if (array[i].contains(site)) {
                 table = array[i];
